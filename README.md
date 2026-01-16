@@ -1,6 +1,6 @@
 # Feedback Hub - Customer Feedback Analyzer
 
-Feedback Hub is a simple web application designed for Giva to collect, analyze, and visualize customer feedback for products like rings, necklaces, and earrings. It uses a Flask backend for data handling and a responsive HTML/JS frontend for the dashboard.
+Feedback Hub is a simple web application designed for Giva to collect, analyze, and visualize customer feedback for products like rings, necklaces, and earrings. It uses a Flask backend for data handling and a responsive HTML frontend for the dashboard.
 
 ## Features
 
@@ -8,7 +8,7 @@ Feedback Hub is a simple web application designed for Giva to collect, analyze, 
 -   **Feedback API**: Endpoints to submit and retrieve feedback.
 -   **Sentiment Analysis**: Rule-based logic to classify feedback as Positive or Negative based on keyword counts.
 -   **Theme Detection**: Identifies themes (Comfort, Durability, Appearance) based on specific keywords.
--   **Data Persistence**: Stores feedback in `feedback_data.json` so data survives server restarts.
+-   **Data Persistence**: Stores feedback in `feedback_data.json` so data survives when server restarts.
 
 ### Frontend (`templates/index.html`)
 -   **Submission Form**: Easy-to-use form for customers to rate and review products.
@@ -54,5 +54,6 @@ Insights are generated client-side when you click "Generate Insights":
 ## Project Structure
 
 -   `app.py`: Flask backend application.
--   `templates/index.html`: Frontend HTML/CSS/JS.
--   `feedback_data.json`: Data storage file (created automatically).
+-   `templates/index.html`: Frontend HTML.
+-   `feedback_data.json`: Data storage file.
+
