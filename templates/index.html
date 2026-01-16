@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Hub - Giva</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #d4af37;
+            /* Gold */
+            --dark: #1a1a1a;
+            --light: #f5f5f5;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: var(--text);
+        }
+
+        header {
+            background-color: var(--dark);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--dark);
+            color: var(--primary);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .insights-box {
+            background-color: #fff8e1;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .review-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge-positive {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-negative {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-neutral {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Feedback Hub</h1>
+        <p>Customer Feedback Analyzer & Dashboard</p>
+    </header>
+
+    <div class="container">
+        <!-- Left Column: Submission Form -->
+        <div class="left-col">
+            <div class="card">
+                <h2>Submit Feedback</h2>
+                <form id="feedbackForm">
+                    <div class="form-group">
+                        <label for="product">Product</label>
+                        <select id="product" required>
+                            <option value="" disabled selected>Select a product</option>
+                            <option value="ring_001">Diamond Ring</option>
+                            <option value="necklace_002">Gold Necklace</option>
+                            <option value="earrings_003">Silver Earrings</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rating">Rating (1-5)</label>
+                        <input type="number" id="rating" min="1" max="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="review">Review</label>
+                        <textarea id="review" rows="5" placeholder="Share your experience..." required></textarea>
+                    </div>
+
+                    <button type="submit">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Dashboard -->
+        <div class="right-col">
+            <div class="card" id="dashboard" style="display: none;">
+                <h2>Dashboard: <span id="dash-product-name"></span></h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <h3>Sentiment Analysis</h3>
+                        <div class="chart-container">
+                            <canvas id="sentimentChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Theme Detection</h3>
+                        <div class="chart-container">
+                            <canvas id="themeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-box">
+                    <h3>AI Insights</h3>
+                    <ul id="insightsList"></ul>
+                    <button onclick="generateInsights()" style="margin-top: 0.5rem; font-size: 0.9rem;">Generate
+                        Insights</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Recent Reviews</h2>
+                <div id="reviewsList">
+                    <p style="color: #666; font-style: italic;">Select a product to view reviews.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sentimentChartInstance = null;
+        let themeChartInstance = null;
+        let currentReviews = [];
+
+        document.getElementById('product').addEventListener('change', function () {
+            loadDashboard(this.value);
+        });
+
+        document.getElementById('feedbackForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const product_id = document.getElementById('product').value;
+            const rating = document.getElementById('rating').value;
+            const text = document.getElementById('review').value;
+
+            const response = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id, rating, text })
+            });
+
+            if (response.ok) {
+                alert('Feedback submitted successfully!');
+                document.getElementById('review').value = '';
+                document.getElementById('rating').value = '';
+                loadDashboard(product_id);
+            } else {
+                alert('Error submitting feedback');
+            }
+        });
+
+        async function loadDashboard(productId) {
+            const productName = document.querySelector(`option[value="${productId}"]`).text;
+            document.getElementById('dash-product-name').innerText = productName;
+            document.getElementById('dashboard').style.display = 'block';
+
+            const response = await fetch(`/api/feedback/${productId}`);
+            const data = await response.json();
+
+            currentReviews = data.reviews; // Store for local analysis
+
+            updateCharts(data.stats);
+            updateReviewsList(data.reviews);
+
+            // Clear previous insights. They will only generate when button is clicked.
+            document.getElementById('insightsList').innerHTML = '';
+        }
+
+        function updateCharts(stats) {
+            // Sentiment Chart
+            const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+
+            if (sentimentChartInstance) sentimentChartInstance.destroy();
+
+            const sentimentLabels = Object.keys(stats.sentiment);
+            const sentimentData = Object.values(stats.sentiment);
+
+            // Map colors to labels
+            const sentimentColors = sentimentLabels.map(label => {
+                if (label === 'Positive') return '#4caf50'; // Green
+                if (label === 'Negative') return '#f44336'; // Red
+                return '#9e9e9e'; // Grey for Neutral or others
+            });
+
+            sentimentChartInstance = new Chart(sentimentCtx, {
+                type: 'pie',
+                data: {
+                    labels: sentimentLabels,
+                    datasets: [{
+                        data: sentimentData,
+                        backgroundColor: sentimentColors
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Theme Chart
+            const themeCtx = document.getElementById('themeChart').getContext('2d');
+
+            if (themeChartInstance) themeChartInstance.destroy();
+
+            themeChartInstance = new Chart(themeCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(stats.themes),
+                    datasets: [{
+                        label: 'Mentions',
+                        data: Object.values(stats.themes),
+                        backgroundColor: '#d4af37'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+
+        function updateReviewsList(reviews) {
+            const list = document.getElementById('reviewsList');
+            list.innerHTML = '';
+
+            if (reviews.length === 0) {
+                list.innerHTML = '<p>No reviews yet.</p>';
+                return;
+            }
+
+            // Reverse to show newest first
+            const sortedReviews = [...reviews].reverse();
+            const initialShowCount = 5;
+
+            const renderReview = (review) => {
+                const sentimentClass = `badge-${review.sentiment.toLowerCase()}`;
+                const themes = review.themes.length > 0 ? review.themes.join(', ') : 'None';
+
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                item.innerHTML = `
+                <div class="review-header">
+                    <strong>Rating: ${review.rating}/5</strong>
+                    <span class="badge ${sentimentClass}">${review.sentiment}</span>
+                </div>
+                <p>${review.text}</p>
+                <small style="color: #666;">Themes: ${themes}</small>
+            `;
+                return item;
+            };
+
+            // Show first 5
+            sortedReviews.slice(0, initialShowCount).forEach(review => {
+                list.appendChild(renderReview(review));
+            });
+
+            // If more than 5, add Show More button
+            if (sortedReviews.length > initialShowCount) {
+                const showMoreBtn = document.createElement('button');
+                showMoreBtn.innerText = 'Show More';
+                showMoreBtn.style.marginTop = '1rem';
+                showMoreBtn.style.width = '100%';
+                showMoreBtn.style.backgroundColor = '#eee';
+                showMoreBtn.style.color = '#333';
+
+                showMoreBtn.onclick = function () {
+                    // Show the rest
+                    sortedReviews.slice(initialShowCount).forEach(review => {
+                        list.insertBefore(renderReview(review), showMoreBtn);
+                    });
+                    showMoreBtn.remove(); // Remove button after showing all
+                };
+
+                list.appendChild(showMoreBtn);
+            }
+        }
+
+        function generateInsights() {
+            const list = document.getElementById('insightsList');
+            list.innerHTML = '';
+
+            if (currentReviews.length === 0) {
+                list.innerHTML = '<li>No feedback yet for this product.</li>';
+                return;
+            }
+
+            let durabilityIssues = 0;
+            let comfortIssues = 0;
+            let appearanceIssues = 0;
+
+            currentReviews.forEach(review => {
+                if (review.sentiment === 'Negative') {
+                    if (review.themes.includes('Durability')) durabilityIssues++;
+                    if (review.themes.includes('Comfort')) comfortIssues++;
+                    if (review.themes.includes('Appearance')) appearanceIssues++;
+                }
+            });
+
+            const total = currentReviews.length;
+            const threshold = total * 0.3; // 30% threshold
+            let hasInsights = false;
+
+            if (durabilityIssues > threshold) {
+                const li = document.createElement('li');
+                li.innerText = "Improve durability";
+                list.appendChild(li);
+                hasInsights = true;
+            }
+
+            if (comfortIssues > threshold) {
+                const li = document.createElement('li');
+                li.innerText = "Consider lighter designs";
+                list.appendChild(li);
+                hasInsights = true;
+            }
+
+            if (appearanceIssues > threshold) {
+                const li = document.createElement('li');
+                li.innerText = "Revamp design aesthetics";
+                list.appendChild(li);
+                hasInsights = true;
+            }
+
+            if (!hasInsights) {
+                const li = document.createElement('li');
+                li.innerText = "Customers seem generally satisfied.";
+                list.appendChild(li);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
