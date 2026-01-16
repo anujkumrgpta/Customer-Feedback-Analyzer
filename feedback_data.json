@@ -1,0 +1,52 @@
+[
+    {
+        "product_id": "ring_001",
+        "rating": 5,
+        "text": "This ring is shiny and elegant.",
+        "sentiment": "Positive",
+        "themes": [
+            "Appearance"
+        ]
+    },
+    {
+        "product_id": "ring_001",
+        "rating": 1,
+        "text": "It broke after one day. Very fragile.",
+        "sentiment": "Negative",
+        "themes": [
+            "Durability"
+        ]
+    },
+    {
+        "product_id": "ring_001",
+        "rating": 5,
+        "text": "This ring is shiny and elegant.",
+        "sentiment": "Positive",
+        "themes": [
+            "Appearance"
+        ]
+    },
+    {
+        "product_id": "ring_001",
+        "rating": 1,
+        "text": "It broke after one day. Very fragile.",
+        "sentiment": "Negative",
+        "themes": [
+            "Durability"
+        ]
+    },
+    {
+        "product_id": "ring_001",
+        "rating": 5,
+        "text": "beutiful",
+        "sentiment": "Positive",
+        "themes": []
+    },
+    {
+        "product_id": "ring_001",
+        "rating": 5,
+        "text": "femjef",
+        "sentiment": "Positive",
+        "themes": []
+    }
+]
