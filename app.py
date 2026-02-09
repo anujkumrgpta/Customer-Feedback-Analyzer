@@ -73,10 +73,6 @@ def detect_themes(text):
     
     return detected
 
-# Note: generate_insights is now handled in frontend (Task B3), but keeping backend route if needed for future or legacy support.
-# The user explicitly asked to move logic to frontend, but didn't ask to delete the backend endpoint. 
-# However, the frontend no longer calls /api/insights. We can leave it or remove it. 
-# Given the instruction "move logic", leaving it is harmless but unused.
 
 @app.route('/')
 def index():
@@ -111,9 +107,8 @@ def submit_feedback():
 
 @app.route('/api/feedback/<product_id>', methods=['GET'])
 def get_feedback(product_id):
-    # Reload data to ensure we have the latest if modified externally (optional but good for dev)
+    # Reload data to ensure we have the latest if modified externally 
     # feedback_store = load_data() 
-    # For simplicity and performance, we trust the in-memory store is in sync via save_data
     
     product_reviews = [f for f in feedback_store if f['product_id'] == product_id]
     
@@ -139,3 +134,4 @@ def get_insights(product_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
