@@ -124,14 +124,10 @@ def get_feedback(product_id):
             "sentiment": dict(sentiment_counts),
             "themes": dict(theme_counts)
         }
-    })
-
-@app.route('/api/insights/<product_id>', methods=['GET'])
-def get_insights(product_id):
-    # This endpoint is likely unused now as logic moved to frontend, but keeping for compatibility
-    return jsonify({"insights": []}) 
+    }) 
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
